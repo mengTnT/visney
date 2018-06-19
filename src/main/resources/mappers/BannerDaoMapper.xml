@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tthome.visney.dao.BannerDao" >
+  <resultMap id="BaseResultMap" type="com.tthome.visney.entity.Banner" >
+    <id column="banner_id" property="bannerId" jdbcType="INTEGER" />
+    <result column="banner_alt" property="bannerAlt" jdbcType="VARCHAR" />
+    <result column="banner_src" property="bannerSrc" jdbcType="VARCHAR" />
+    <result column="banner_type_id" property="bannerTypeId"/>
+  </resultMap>
+
+  <select id="selectAllByTpye" resultMap="BaseResultMap" >
+    select *
+    from banner
+    where banner_type_id=#{bannerTypeId}
+  </select>
+</mapper>

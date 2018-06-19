@@ -1,0 +1,32 @@
+#服务器相关配置
+server:
+  port: 80
+  servlet:
+    context-path: /
+#图片上传路径
+web:
+  upload-path: D:/visney-manager
+#mysql相关配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: tthome
+    url: jdbc:mysql://192.168.100.250:3306/tthome_visney?characterEncoding=utf-8&useSSL=false
+  mvc:
+   static-path-pattern: /**
+    #配置图片上传路径
+  resources:
+        static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}
+  thymeleaf:
+    prefix: classpath:/static/
+
+ #MyBatis相关配置
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+# 分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql

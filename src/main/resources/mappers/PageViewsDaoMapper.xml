@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tthome.visney.dao.PageViewsDao" >
+  <resultMap id="BaseResultMap" type="com.tthome.visney.entity.PageViews" >
+    <id column="page_views_id" property="pageViewsId" jdbcType="INTEGER" />
+    <result column="page_views_count" property="pageViewsCount" jdbcType="INTEGER" />
+  </resultMap>
+
+
+  <update id="articlePageCountAdd">
+
+      update page_views set page_views_count=page_views_count+1
+WHERE page_views_id=(
+SELECT article_page_views_id FROM article
+WHERE article_id=#{articleId}
+)
+
+  </update>
+
+
+  <update id="proPageCountAdd">
+
+      update page_views set page_views_count=page_views_count+1
+WHERE page_views_id=(
+SELECT page_views_id FROM product
+WHERE pro_id=#{proId}
+)
+
+  </update>
+</mapper>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tthome.visney.dao.ProductDao">
+    <resultMap id="BaseResultMap" type="com.tthome.visney.entity.Product">
+        <id column="pro_id" property="proId" jdbcType="INTEGER"/>
+        <result column="pro_name" property="proName" jdbcType="VARCHAR"/>
+        <result column="pro_price" property="proPrice" jdbcType="DECIMAL"/>
+        <result column="pro_msg" property="proMsg" jdbcType="VARCHAR"/>
+        <result column="pro_src" property="proSrc" jdbcType="VARCHAR"/>
+        <result column="pro_add_time" property="proAddTime"/>
+        <result column="pro_update_time" property="proUpdateTime"/>
+        <result column="pro_putaway" property="proPutaway" jdbcType="TINYINT"/>
+        <result column="pro_meta_keyword" property="proMetaKeyWord"/>
+        <result column="pro_meta_description" property="proMetaDescription"/>
+        <result column="pro_meta_title" property="proMetaTitle"/>
+        <association property="brand" javaType="com.tthome.visney.entity.Brand">
+            <result column="brand_id" property="brandId"></result>
+            <result column="brand_name" property="brandName"></result>
+        </association>
+        <association property="modleCode" javaType="com.tthome.visney.entity.ModleCode">
+            <result column="model_code_id" property="modelCodeId"></result>
+            <result column="model_code_name" property="modelCodeName"></result>
+        </association>
+        <association property="size" javaType="com.tthome.visney.entity.Size">
+            <result column="size_id" property="sizeId"></result>
+            <result column="size_msg" property="siziMsg"></result>
+        </association>
+        <association property="pageViews" javaType="com.tthome.visney.entity.PageViews" >
+            <result column="page_views_id" property="pageViewsId"></result>
+            <result column="page_views_count" property="pageViewsCount"></result>
+        </association>
+        <association property="proPosition" javaType="com.tthome.visney.entity.ProPosition" >
+            <result column="position_id" property="proPositionId"></result>
+            <result column="pname" property="proPositionName"></result>
+        </association>
+        <association property="proStyle" javaType="com.tthome.visney.entity.ProStyle" >
+            <result column="style_id" property="proStyleId"></result>
+            <result column="sname" property="proStyleName"></result>
+        </association>
+        <association property="proType" javaType="com.tthome.visney.entity.ProType" >
+            <result column="type_id" property="proTypeId"></result>
+            <result column="tname" property="proTypeName"></result>
+        </association>
+        <association property="proSeries" javaType="com.tthome.visney.entity.ProSeries" >
+            <result column="series_id" property="proSeriesId"></result>
+            <result column="srname" property="proSeriesName"></result>
+        </association>
+        <association property="proTexture" javaType="com.tthome.visney.entity.ProTexture" >
+            <result column="texture_id" property="proTextureId"></result>
+            <result column="txname" property="proTextureName"></result>
+        </association>
+        <collection property="proImgs" ofType="com.tthome.visney.entity.ProImg" select="getImgsAll" column="pro_id">
+            <id column="pro_img_id" property="proImgId"></id>
+            <result column="pro_img_alt" property="proImgAlt"></result>
+            <result column="pro_img_src" property="proImgSrc"></result>
+            <result column="pro_img_cover" property="proImgCover"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="productVO" type="com.tthome.visney.vo.ProductVO">
+        <result column="pro_id" property="proId"></result>
+        <result column="pro_name" property="proName"></result>
+        <result column="pro_price" property="proPrice"></result>
+
+        <result column="position_id" property="proPositionId"></result>
+        <result column="type_id" property="proTypeId"></result>
+        <result column="style_id" property="proStyleId"></result>
+        <result column="series_id" property="proSeriesId"></result>
+        <result column="texture_id" property="proTextureId"></result>
+
+        <collection property="proImgs" ofType="com.tthome.visney.entity.ProImg" select="getImgs" column="pro_id">
+            <id column="pro_img_id" property="proImgId"></id>
+            <result column="pro_img_alt" property="proImgAlt"></result>
+            <result column="pro_img_src" property="proImgSrc"></result>
+            <result column="pro_img_cover" property="proImgCover"></result>
+        </collection>
+
+    </resultMap>
+
+    <resultMap id="proImg" type="com.tthome.visney.entity.ProImg">
+        <id column="pro_img_id" property="proImgId"></id>
+        <result column="pro_img_alt" property="proImgAlt"></result>
+        <result column="pro_img_src" property="proImgSrc"></result>
+        <result column="pro_img_cover" property="proImgCover"></result>
+    </resultMap>
+
+    <select id="getImgs" resultMap="proImg">
+        select * from pro_img
+        where pro_id=#{pro_id}  and pro_img_cover=1
+
+    </select>
+
+    <select id="getImgsAll" resultMap="proImg">
+        select * from pro_img
+        where pro_id=#{pro_id}
+
+    </select>
+
+    <select id="selectByConditionCOUNT" resultType="int">
+        select count(*) from product t1
+        <where>
+            t1.pro_putaway=1
+            <if test="positionId!=null and positionId!=0">
+                 and position_id =#{positionId}
+            </if>
+            <if test="styleId!=null and styleId!=0">
+                and style_id =#{styleId}
+            </if>
+            <if test="typeId!=null and typeId!=0">
+                and type_id =#{typeId}
+            </if>
+            <if test="seriesId!=null and seriesId!=0">
+                and series_id =#{seriesId}
+            </if>
+            <if test="textureId!=null and textureId!=0">
+                and texture_id =#{textureId}
+            </if>
+        </where>
+    </select>
+    <!-- 只展示了封面图片-->
+    <select id="selectByPosition" resultMap="productVO">
+      SELECT t1.pro_id,t1.pro_name,t1.pro_price,t1.position_id,t1.type_id,t1.style_id,t1.texture_id,t1.series_id FROM product t1
+
+        WHERE position_id =#{positionId} and pro_putaway=1
+        ORDER BY pro_add_time DESC
+        LIMIT 8
+    </select>
+    <!-- 只展示了封面图片-->
+    <select id="selectByCondition" resultMap="productVO">
+        SELECT t1.pro_id,t1.pro_name,t1.pro_price,t1.position_id,t1.type_id,t1.texture_id,t1.series_id,t1.style_id ,t2.page_views_count,t1.pro_add_time FROM product t1
+        LEFT JOIN page_views t2 ON t1.page_views_id=t2.page_views_id
+
+       <where>
+            t1.pro_putaway=1
+            <if test="proCondition.positionId!=null and proCondition.positionId!=0">
+                 and t1.position_id =#{proCondition.positionId}
+            </if>
+            <if test="proCondition.styleId!=null and proCondition.styleId!=0">
+                and t1.style_id =#{proCondition.styleId}
+            </if>
+            <if test="proCondition.typeId!=null and proCondition.typeId!=0">
+                and t1.type_id =#{proCondition.typeId}
+            </if>
+            <if test="proCondition.seriesId!=null and proCondition.seriesId!=0">
+                and t1.series_id =#{proCondition.seriesId}
+            </if>
+            <if test="proCondition.textureId!=null and proCondition.textureId!=0">
+                and t1.texture_id =#{proCondition.textureId}
+            </if>
+        </where>
+
+       <if test="proCondition.orderByPageViewsCount==1">
+            ORDER BY t2.page_views_count DESC
+        </if>
+
+        <if test="proCondition.orderByPrice==1">
+            ORDER BY t1.pro_price DESC
+        </if>
+
+        <if test="proCondition.orderByTime==1">
+            ORDER BY t1.pro_add_time DESC
+        </if>
+        limit #{start},#{end}
+
+    </select>
+
+    <select id="getProDetail" resultMap="BaseResultMap">
+
+       SELECT t1.*,t2.brand_name,t3.pro_category_name pname,t4.pro_category_name sname,t5.pro_category_name tname,t6.pro_category_name srname,t7.pro_category_name txname,t8.size_msg,t9.page_views_count,t11.model_code_name
+from product t1
+LEFT JOIN brand t2 ON t1.brand_id=t2.brand_id
+LEFT JOIN pro_category t3 ON t1.position_id=t3.pro_category_id
+LEFT JOIN pro_category t4 ON t1.style_id=t4.pro_category_id
+LEFT JOIN pro_category t5 ON t1.type_id=t5.pro_category_id
+LEFT JOIN pro_category t6 ON t1.series_id=t6.pro_category_id
+LEFT JOIN pro_category t7 ON t1.texture_id=t7.pro_category_id
+LEFT JOIN size t8 ON t1.size_id=t8.size_id
+LEFT JOIN page_views t9 ON t1.page_views_id=t9.page_views_id
+
+LEFT JOIN modle_code t11 ON t1.model_code_id=t11.model_code_id
+        WHERE t1.pro_id=#{productId}
+    </select>
+
+    <select id="getProByTpyeId" resultMap="productVO">
+         SELECT t1.pro_id,pro_name,pro_price,t1.position_id,t1.type_id,t1.texture_id,t1.series_id,t1.style_id FROM product t1
+
+        WHERE type_id =#{proTypeId} and pro_putaway=1
+        ORDER BY pro_add_time DESC
+        LIMIT #{size}
+    </select>
+
+    <select id="getProRandom" resultMap="productVO">
+        SELECT t1.pro_id,pro_name,pro_price,t1.position_id,t1.type_id,t1.texture_id,t1.series_id,t1.style_id FROM product t1
+
+        WHERE  pro_putaway=1
+        ORDER BY RAND()
+        LIMIT #{size}
+    </select>
+
+</mapper>

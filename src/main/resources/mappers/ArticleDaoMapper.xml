@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tthome.visney.dao.ArticleDao">
+
+    <resultMap id="ArticleVO" type="com.tthome.visney.vo.ArticleVO">
+        <id column="article_id" property="articleId"></id>
+        <result column="article_name" property="articleName"/>
+        <result column="article_text" property="articleText"/>
+        <result column="article_add_time" property="articleAddTime"/>
+        <result column="article_update_time" property="articleUpdateTime"/>
+        <result column="article_category_name" property="articleCategoryName"/>
+        <result column="article_category_id" property="articleCategoryId"/>
+        <association property="articleImg" javaType="com.tthome.visney.entity.ArticleImg">
+            <result column="article_img_id" property="articleImgId"/>
+            <result column="article_img_alt" property="articleImgAlt"/>
+            <result column="article_img_src" property="articleImgSrc"/>
+        </association>
+        <collection property="labelList" ofType="com.tthome.visney.entity.ArticleLabel" select="getLabel"
+                    column="article_id">
+            <id column="article_label_id" property="articleLabelId"/>
+            <result column="article_label_name" property="articleLabelName"/>
+            <result column="article_id" property="articleId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="ArticleRecomend" type="com.tthome.visney.vo.ArticleRecomend">
+        <result column="article_id" property="articleId"/>
+        <result column="article_name" property="articleName"/>
+        <result column="article_add_time" property="articleAddTime"/>
+        <result column="article_category_id" property="articleCategoryId"/>
+    </resultMap>
+
+    <resultMap id="Article" type="com.tthome.visney.entity.Article">
+        <id column="article_id" property="articleId"></id>
+        <result column="article_name" property="articleName"/>
+        <result column="article_text" property="articleText"/>
+        <result column="article_cover_img" property="articleCoverImg"/>
+        <result column="article_add_time" property="articleAddTime"/>
+        <result column="article_update_time" property="articleUpdateTime"/>
+        <result column="article_recommend" property="articleRecommend"/>
+        <result column="article_meta_description" property="articleMetaDescription"/>
+        <result column="article_meta_title" property="articleMetaTitle"/>
+        <result column="article_meta_keyword" property="articleKeyWord"/>
+        <association property="articleEditor" javaType="com.tthome.visney.entity.ArticleEditor">
+            <result column="article_editor_id" property="articleEditorId"/>
+            <result column="article_editor_name" property="articleEditorName"/>
+        </association>
+
+        <association property="articleCategory" javaType="com.tthome.visney.entity.ArticleCategory">
+            <result column="article_category_id" property="articleCategoryId"/>
+            <result column="article_category_name" property="articleCategoryName"/>
+        </association>
+        <association property="articleImg" javaType="com.tthome.visney.entity.ArticleImg">
+            <result column="article_img_id" property="articleImgId"/>
+            <result column="article_img_alt" property="articleImgAlt"/>
+            <result column="article_img_src" property="articleImgSrc"/>
+        </association>
+        <association property="pageViews" javaType="com.tthome.visney.entity.PageViews">
+            <result column="page_views_id" property="pageViewsId"/>
+            <result column="page_views_count" property="pageViewsCount"/>
+        </association>
+        <collection property="labelList" ofType="com.tthome.visney.entity.ArticleLabel" select="getLabel"
+                    column="article_id">
+            <id column="article_label_id" property="articleLabelId"/>
+            <result column="article_label_name" property="articleLabelName"/>
+            <result column="article_id" property="articleId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="ArticleLabel" type="com.tthome.visney.entity.ArticleLabel">
+        <id column="article_label_id" property="articleLabelId"/>
+        <result column="article_label_name" property="articleLabelName"/>
+        <result column="article_id" property="articleId"/>
+    </resultMap>
+
+    <select id="getLabel" resultMap="ArticleLabel">
+select * from article_label
+where article_id=#{article_id}
+limit 2
+
+    </select>
+
+    <select id="getRecommend" resultMap="ArticleVO">
+    SELECT a.*, t6.article_img_alt,t6.article_img_src,ac.article_category_name
+    FROM article a
+    LEFT JOIN article_category ac
+    ON a.article_category_id = ac.article_category_id
+    LEFT JOIN article_img t6 ON a.article_img_id = t6.article_img_id
+    WHERE a.article_category_id = #{articleCategoryId} and a.article_recommend=1
+    ORDER BY a.article_add_time DESC
+    LIMIT 1
+    </select>
+
+    <select id="getArticleNew" resultMap="ArticleRecomend">
+     SELECT
+	article_id,
+	article_name,
+	article_add_time,
+ac.article_category_id
+    FROM
+	article a
+	LEFT JOIN article_category ac
+    ON a.article_category_id = ac.article_category_id
+    ORDER BY
+	article_add_time DESC
+    LIMIT #{size}
+    </select>
+
+    <select id="getRecommendsByCategoryId" resultMap="ArticleVO">
+    SELECT
+	a.*, ac.article_category_name,ai.article_img_alt,ai.article_img_src
+FROM
+	article a
+LEFT JOIN article_category ac ON a.article_category_id = ac.article_category_id
+LEFT JOIN article_img ai on a.article_img_id=ai.article_img_id
+    WHERE a.article_category_id = #{articleCategoryId}
+    ORDER BY RAND()
+    LIMIT #{size}
+    </select>
+
+    <select id="getArticleDetails" resultMap="Article">
+SELECT
+	t1.article_id,
+	t1.article_name,
+	t1.article_text,
+	t1.article_editor_id,
+	t3.article_editor_name,
+	t1.article_category_id,
+	t4.article_category_name,
+	t1.article_page_views_id,
+	t5.page_views_id,
+	t5.page_views_count,
+	t1.article_add_time,
+	t1.article_update_time,
+	t2.article_label_id,
+	t2.article_label_name,
+	t6.*, t1.article_meta_title,
+	t1.article_meta_description,
+	t1.article_meta_keyword,
+	t1.article_recommend
+FROM
+	article t1
+LEFT JOIN article_label t2 ON t1.article_id = t2.article_id
+LEFT JOIN article_editor t3 ON t1.article_editor_id = t3.article_editor_id
+LEFT JOIN article_category t4 ON t1.article_category_id = t4.article_category_id
+LEFT JOIN page_views t5 ON t1.article_page_views_id = t5.page_views_id
+LEFT JOIN article_img t6 ON t1.article_img_id = t6.article_img_id
+WHERE t1.article_id=#{articleId}
+    </select>
+
+    <select id="getArticles" resultMap="ArticleVO">
+ SELECT t1.article_id,t1.article_name,t1.article_text,t1.article_category_id,t4.article_category_name,t1.article_add_time,
+t5.*
+ FROM article t1
+
+LEFT JOIN article_category t4 ON t1.article_category_id=t4.article_category_id
+LEFT JOIN article_img t5 ON t1.article_img_id=t5.article_img_id
+WHERE t1.article_category_id=#{articleCategoryId}
+ORDER BY t1.article_add_time desc
+    </select>
+
+    <select id="getTotalByArticleCategoryId" resultType="int">
+        select count(*) from article t1
+        where t1.article_category_id=#{articleCategoryId}
+    </select>
+
+
+    <select id="getArticlesByLabelTotal" resultType="int">
+       select count(*) from article_label
+WHERE article_label_name=(select article_label_name FROM article_label WHERE article_label_id=#{articleLabelId})
+
+    </select>
+    <select id="getArticlesByLabel" resultMap="Article">
+
+SELECT t1.*,t2.article_label_id,t2.article_label_name FROM article t1
+LEFT JOIN article_label t2 ON t1.article_id = t2.article_id
+WHERE t2.article_label_name=(select article_label_name FROM article_label WHERE article_label_id=#{articleLabelId})
+ORDER BY article_add_time desc
+
+    </select>
+
+    <select id="getArticleCenterRecommends" resultMap="ArticleVO">
+     SELECT a.article_id,a.article_name,a.article_add_time,a.article_text,a.article_recommend, ac.article_category_name,t1.article_img_id,t1.article_img_alt,t1.article_img_src,a.article_category_id
+    FROM article a
+    LEFT JOIN article_category ac ON a.article_category_id = ac.article_category_id
+    LEFT JOIN article_img t1 ON a.article_img_id=t1.article_img_id
+    WHERE a.article_recommend=1
+    ORDER BY RAND()
+    LIMIT 4
+    </select>
+
+    <select id="getArticleRandom" resultMap="ArticleVO">
+SELECT t1.article_id,t1.article_name ,t1.article_category_id,t2.*
+FROM article t1
+LEFT JOIN article_img t2 ON t1.article_img_id=t2.article_img_id
+LEFT JOIN article_category t3 ON t1.article_category_id=t3.article_category_id
+ORDER BY RAND()
+LIMIT 5
+    </select>
+
+    <select id="getArticleNextAndBefore" resultMap="ArticleRecomend">
+        select * from(SELECT @rownum:=@rownum+1 AS rownum, t1.article_id,t1.article_name,t1.article_category_id
+FROM (SELECT @rownum:=0) r, article t1
+WHERE t1.article_category_id=#{articleCategoryId}) t2
+WHERE t2.rownum=(SELECT t2.rownum-1 from(SELECT @rownum:=@rownum+1 AS rownum, t1.article_id,t1.article_name,t1.article_category_id
+FROM (SELECT @rownum:=0) r, article t1
+WHERE t1.article_category_id=#{articleCategoryId}) t2 WHERE t2.article_id=#{articleId}) OR t2.rownum=(SELECT t2.rownum+1 from(SELECT @rownum:=@rownum+1 AS rownum, t1.article_id,t1.article_name,t1.article_category_id
+FROM (SELECT @rownum:=0) r, article t1
+WHERE t1.article_category_id=#{articleCategoryId}) t2 WHERE t2.article_id=#{articleId})
+
+    </select>
+
+</mapper>
