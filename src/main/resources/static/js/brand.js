@@ -1,0 +1,1 @@
+"use strict";!function(){var t=$("html, body");$(".h-nav-list-child li a").click(function(){return t.animate({scrollTop:$($(this).attr("href")).offset().top},500),!1})}(),$(function(){var t=document.getElementById("story-video");videoPlay(t,"../images/brand/story-bottom-vedios1.png","#story-video")});
