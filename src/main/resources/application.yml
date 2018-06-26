@@ -1,11 +1,11 @@
 #服务器相关配置
 server:
-  port: 80
+  port: 81
   servlet:
-    context-path: /
+    context-path:　/
 #图片上传路径
 web:
-  upload-path: D:/visney-manager
+  upload-path: D:/visney
 #mysql相关配置
 spring:
   datasource:
